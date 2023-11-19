@@ -6,25 +6,38 @@ const server = fastify();
 
 //podemos usar o tradicional request e response; Mas por padrão no fastfy é usado REPLY
 server.post("/videos", (request, reply) => {
+  const { title, description, duration } = request.body;
   database.create({
-    title: "Video 01",
-    description: "Este é o vídeo 01",
-    duration: 100,
+    title,
+    description,
+    duration,
   });
 
   return reply.status(201).send();
 });
 
-server.get("/videos", () => {
-  return "Hello World";
+server.get("/videos", (request) => {
+  const search = request.query.search;
+  const videos = database.list();
+  return videos;
 });
 
-server.put("/videos/:id", () => {
-  return "Hello World";
+server.put("/videos/:id", (request, reply) => {
+  const videoId = request.params.id;
+  const { title, description, duration } = request.body;
+  database.update(videoId, {
+    title,
+    description,
+    duration,
+  });
+
+  return reply.status(204).send();
 });
 
-server.delete("/videos/:id", () => {
-  return "Hello World";
+server.delete("/videos/:id", (request, reply) => {
+  const videoId = request.params.id;
+  database.delete(videoId);
+  return reply.status(204).send();
 });
 
 server.listen({
